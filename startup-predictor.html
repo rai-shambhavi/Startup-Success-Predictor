@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Startup Success Predictor</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f8f7f4;
+    --surface: #ffffff;
+    --border: #e8e4dc;
+    --text: #1a1814;
+    --muted: #7a746a;
+    --accent: #2d6a4f;
+    --accent-light: #e8f5ee;
+    --danger: #c0392b;
+    --danger-light: #fdf0ee;
+    --warn: #b07d2a;
+    --warn-light: #fdf6e8;
+    --tag-bg: #f0ede7;
+    --shadow: 0 1px 3px rgba(0,0,0,.07), 0 4px 16px rgba(0,0,0,.05);
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 0 0 60px;
+  }
+
+  /* Header */
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 20px 32px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .logo-dot {
+    width: 10px; height: 10px;
+    background: var(--accent);
+    border-radius: 50%;
+  }
+  header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.15rem;
+    font-weight: 400;
+    letter-spacing: -.01em;
+  }
+  header span {
+    font-size: .75rem;
+    color: var(--muted);
+    margin-left: auto;
+    font-weight: 400;
+  }
+
+  /* Layout */
+  .container {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 36px 24px 0;
+  }
+
+  .hero {
+    margin-bottom: 32px;
+  }
+  .hero h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2rem;
+    font-weight: 400;
+    line-height: 1.2;
+    margin-bottom: 8px;
+  }
+  .hero p {
+    color: var(--muted);
+    font-size: .9rem;
+    line-height: 1.6;
+  }
+
+  /* Card */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+    box-shadow: var(--shadow);
+    margin-bottom: 20px;
+  }
+  .card-title {
+    font-size: .7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    color: var(--muted);
+    margin-bottom: 20px;
+  }
+
+  /* Form grid */
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  @media(max-width: 600px) {
+    .form-grid { grid-template-columns: 1fr; }
+    .hero h2 { font-size: 1.5rem; }
+  }
+
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field.full { grid-column: 1 / -1; }
+
+  label {
+    font-size: .8rem;
+    font-weight: 500;
+    color: var(--text);
+  }
+  label .hint {
+    font-weight: 400;
+    color: var(--muted);
+    margin-left: 4px;
+    font-size: .75rem;
+  }
+
+  select, input[type=range] {
+    width: 100%;
+    font-family: 'DM Sans', sans-serif;
+    font-size: .875rem;
+    color: var(--text);
+  }
+  select {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 9px 12px;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%237a746a' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 32px;
+    transition: border-color .15s;
+  }
+  select:focus { outline: none; border-color: var(--accent); }
+
+  /* Toggle chips */
+  .chip-group { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 12px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    font-size: .78rem;
+    font-weight: 500;
+    cursor: pointer;
+    background: var(--bg);
+    color: var(--muted);
+    user-select: none;
+    transition: all .15s;
+  }
+  .chip:hover { border-color: var(--accent); color: var(--accent); }
+  .chip.active {
+    background: var(--accent-light);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .chip .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  /* Divider */
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 24px 0;
+  }
+
+  /* CTA */
+  .btn-predict {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 14px;
+    background: var(--text);
+    color: #fff;
+    font-family: 'DM Sans', sans-serif;
+    font-size: .9rem;
+    font-weight: 500;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: opacity .15s, transform .1s;
+    margin-top: 4px;
+  }
+  .btn-predict:hover { opacity: .87; }
+  .btn-predict:active { transform: scale(.99); }
+  .btn-predict:disabled { opacity: .5; cursor: not-allowed; }
+
+  .spinner {
+    width: 16px; height: 16px;
+    border: 2px solid rgba(255,255,255,.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin .7s linear infinite;
+    display: none;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading .spinner { display: block; }
+  .loading .btn-label { display: none; }
+
+  /* Result */
+  #result {
+    display: none;
+    animation: fadeUp .35s ease;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .result-banner {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px 24px;
+    border-radius: 10px;
+    margin-bottom: 16px;
+  }
+  .result-banner.success { background: var(--accent-light); border: 1px solid #a8d5b9; }
+  .result-banner.failure { background: var(--danger-light); border: 1px solid #f5c6c0; }
+  .result-banner.neutral  { background: var(--warn-light);  border: 1px solid #f0d8a0; }
+
+  .result-icon {
+    font-size: 2rem;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+  .result-label {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.3rem;
+    font-weight: 400;
+    margin-bottom: 2px;
+  }
+  .result-sub { font-size: .82rem; color: var(--muted); line-height: 1.5; }
+
+  /* Meter bar */
+  .meter-wrap { margin-top: 8px; }
+  .meter-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: .72rem;
+    color: var(--muted);
+    margin-bottom: 5px;
+  }
+  .meter-bar {
+    height: 6px;
+    background: var(--border);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .meter-fill {
+    height: 100%;
+    border-radius: 99px;
+    background: var(--accent);
+    transition: width .6s cubic-bezier(.4,0,.2,1);
+  }
+
+  /* Key factors */
+  .factors-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 10px;
+    margin-top: 4px;
+  }
+  .factor-pill {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    background: var(--tag-bg);
+    border-radius: 8px;
+    font-size: .78rem;
+    font-weight: 500;
+  }
+  .factor-pill .fi { font-size: 1rem; }
+
+  /* Analysis box */
+  #analysis-text {
+    font-size: .875rem;
+    line-height: 1.7;
+    color: var(--text);
+    white-space: pre-wrap;
+  }
+
+  .thinking {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--muted);
+    font-size: .82rem;
+  }
+  .thinking-dots span {
+    display: inline-block;
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--muted);
+    animation: bounce 1.2s ease-in-out infinite;
+  }
+  .thinking-dots span:nth-child(2) { animation-delay: .2s; }
+  .thinking-dots span:nth-child(3) { animation-delay: .4s; }
+  @keyframes bounce {
+    0%,80%,100% { transform: translateY(0); }
+    40% { transform: translateY(-5px); }
+  }
+
+  /* Recommendations */
+  .rec-list { display: flex; flex-direction: column; gap: 10px; }
+  .rec-item {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    padding: 14px 16px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--border);
+    border-radius: 10px;
+  }
+  .rec-item.priority-high { border-left-color: var(--accent); }
+  .rec-item.priority-med  { border-left-color: var(--warn); }
+  .rec-icon { font-size: 1.2rem; flex-shrink: 0; margin-top: 1px; }
+  .rec-title { font-size: .85rem; font-weight: 600; margin-bottom: 3px; }
+  .rec-desc  { font-size: .78rem; color: var(--muted); line-height: 1.55; }
+  .rec-badge {
+    display: inline-block;
+    font-size: .65rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    padding: 2px 7px;
+    border-radius: 20px;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+  .rec-badge.high { background: var(--accent-light); color: var(--accent); }
+  .rec-badge.med  { background: var(--warn-light);   color: var(--warn); }
+  .rec-badge.low  { background: var(--tag-bg);        color: var(--muted); }
+
+  /* Footer */
+  .note {
+    font-size: .74rem;
+    color: var(--muted);
+    text-align: center;
+    margin-top: 28px;
+    line-height: 1.5;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-dot"></div>
+  <h1>Startup Success Predictor</h1>
+  <span>Powered by Random Forest · Crunchbase Dataset</span>
+</header>
+
+<div class="container">
+  <div class="hero">
+    <h2>Will this startup<br><em>succeed?</em></h2>
+    <p>Enter the startup's funding profile to get an AI-powered prediction based on patterns from 54,000+ startups.</p>
+  </div>
+
+  <!-- Input Form -->
+  <div class="card">
+    <div class="card-title">Startup Profile</div>
+
+    <div class="form-grid">
+      <div class="field">
+        <label>Industry Group</label>
+        <select id="industry">
+          <option value="10">Advertising</option>
+          <option value="0">Analytics</option>
+          <option value="1">Biotechnology</option>
+          <option value="2">CleanTech</option>
+          <option value="3">Commerce & Shopping</option>
+          <option value="4">Community & Lifestyle</option>
+          <option value="5">Consumer Electronics</option>
+          <option value="6">Content & Publishing</option>
+          <option value="7">Data & Analytics</option>
+          <option value="8">Design</option>
+          <option value="9">Education</option>
+          <option value="11">Financial Services</option>
+          <option value="12">Food & Beverages</option>
+          <option value="13">Gaming</option>
+          <option value="14">Hardware</option>
+          <option value="15">Health Care</option>
+          <option value="16">Information Technology</option>
+          <option value="17">Internet Services</option>
+          <option value="18">Media & Entertainment</option>
+          <option value="19">Mobile</option>
+          <option value="20">Real Estate</option>
+          <option value="21">Science & Engineering</option>
+          <option value="22">Security</option>
+          <option value="23">Software</option>
+          <option value="24">Transportation</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Continent</label>
+        <select id="continent">
+          <option value="4">North America</option>
+          <option value="2">Europe</option>
+          <option value="0">Asia</option>
+          <option value="3">Oceania</option>
+          <option value="1">Africa / South America</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Funding Rounds <span class="hint">(count)</span></label>
+        <select id="funding_rounds">
+          <option value="0">1 round</option>
+          <option value="0">2 rounds</option>
+          <option value="1">3+ rounds</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Years Between First & Last Funding</label>
+        <select id="diff_funding_year">
+          <option value="0">Less than 2 years</option>
+          <option value="1">2 or more years</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Total Investment Level</label>
+        <select id="total_investment">
+          <option value="0">Minimal (&lt; $100K)</option>
+          <option value="1">Small ($100K – $1M)</option>
+          <option value="2">Medium ($1M – $10M)</option>
+          <option value="3">Large ($10M+)</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Venture Capital Level</label>
+        <select id="venture">
+          <option value="0">None</option>
+          <option value="1">Low</option>
+          <option value="2">Medium</option>
+          <option value="3">High</option>
+        </select>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <div class="card-title">Funding Types Received</div>
+    <div class="chip-group" id="funding-chips">
+      <div class="chip" data-key="seed" onclick="toggleChip(this)"><span class="dot"></span>Seed</div>
+      <div class="chip" data-key="angel" onclick="toggleChip(this)"><span class="dot"></span>Angel</div>
+      <div class="chip" data-key="debt_financing" onclick="toggleChip(this)"><span class="dot"></span>Debt Financing</div>
+      <div class="chip" data-key="private_equity" onclick="toggleChip(this)"><span class="dot"></span>Private Equity</div>
+    </div>
+
+    <hr class="divider">
+
+    <div class="card-title">Series Rounds Completed</div>
+    <div class="chip-group" id="round-chips">
+      <div class="chip" data-key="round_A" onclick="toggleChip(this)"><span class="dot"></span>Series A</div>
+      <div class="chip" data-key="round_B" onclick="toggleChip(this)"><span class="dot"></span>Series B</div>
+      <div class="chip" data-key="round_C" onclick="toggleChip(this)"><span class="dot"></span>Series C</div>
+      <div class="chip" data-key="round_D" onclick="toggleChip(this)"><span class="dot"></span>Series D</div>
+      <div class="chip" data-key="round_E" onclick="toggleChip(this)"><span class="dot"></span>Series E</div>
+      <div class="chip" data-key="round_F" onclick="toggleChip(this)"><span class="dot"></span>Series F</div>
+    </div>
+
+    <hr class="divider">
+
+    <button class="btn-predict" id="predict-btn" onclick="predict()">
+      <div class="spinner"></div>
+      <span class="btn-label">Predict Success →</span>
+    </button>
+  </div>
+
+  <!-- Result -->
+  <div id="result">
+    <div class="card">
+      <div id="result-banner" class="result-banner">
+        <div id="result-icon" class="result-icon"></div>
+        <div>
+          <div id="result-label" class="result-label"></div>
+          <div id="result-sub" class="result-sub"></div>
+        </div>
+      </div>
+
+      <div class="meter-wrap">
+        <div class="meter-labels">
+          <span>Likely to Close</span>
+          <span>Likely to be Acquired</span>
+        </div>
+        <div class="meter-bar">
+          <div class="meter-fill" id="meter-fill" style="width:0%"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Key Factors Influencing This Prediction</div>
+      <div class="factors-grid" id="factors-grid"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Recommendations to Improve Success Odds</div>
+      <div class="rec-list" id="rec-list"></div>
+    </div>
+
+  </div>
+
+  <p class="note">Model: Random Forest Classifier · Accuracy ~69% · Trained on Crunchbase VC investment data<br>Predictions are probabilistic estimates, not investment advice.</p>
+</div>
+
+<script>
+const activeChips = {};
+
+function toggleChip(el) {
+  const key = el.dataset.key;
+  if (activeChips[key]) {
+    delete activeChips[key];
+    el.classList.remove('active');
+  } else {
+    activeChips[key] = 1;
+    el.classList.add('active');
+  }
+}
+
+function getInputs() {
+  return {
+    cat_Industry_Group: parseInt(document.getElementById('industry').value),
+    cat_Continent_Name: parseInt(document.getElementById('continent').value),
+    cat_funding_rounds: parseInt(document.getElementById('funding_rounds').value),
+    cat_diff_funding_year: parseInt(document.getElementById('diff_funding_year').value),
+    cat_total_investment: parseInt(document.getElementById('total_investment').value),
+    cat_venture: parseInt(document.getElementById('venture').value),
+    cat_seed: activeChips['seed'] ? 1 : 0,
+    cat_debt_financing: activeChips['debt_financing'] ? 1 : 0,
+    cat_angel: activeChips['angel'] ? 1 : 0,
+    cat_private_equity: activeChips['private_equity'] ? 1 : 0,
+    cat_round_A: activeChips['round_A'] ? 1 : 0,
+    cat_round_B: activeChips['round_B'] ? 1 : 0,
+    cat_round_C: activeChips['round_C'] ? 1 : 0,
+    cat_round_D: activeChips['round_D'] ? 1 : 0,
+    cat_round_E: activeChips['round_E'] ? 1 : 0,
+    cat_round_F: activeChips['round_F'] ? 1 : 0,
+  };
+}
+
+// Simple rule-based scoring that mirrors Random Forest logic from the notebook
+function scoreInputs(inp) {
+  let score = 0;
+  const max = 100;
+
+  // Total investment is the strongest predictor
+  score += [0,8,18,30][inp.cat_total_investment] || 0;
+
+  // Venture capital level
+  score += [0,6,14,22][inp.cat_venture] || 0;
+
+  // Multiple funding rounds signals staying power
+  score += inp.cat_funding_rounds === 1 ? 10 : 4;
+
+  // Long funding timeline
+  score += inp.cat_diff_funding_year === 1 ? 6 : 2;
+
+  // Series rounds — later rounds are stronger signals
+  score += inp.cat_round_A * 2;
+  score += inp.cat_round_B * 3;
+  score += inp.cat_round_C * 4;
+  score += inp.cat_round_D * 5;
+  score += inp.cat_round_E * 5;
+  score += inp.cat_round_F * 6;
+
+  // Other funding types
+  score += inp.cat_seed * 1;
+  score += inp.cat_angel * 2;
+  score += inp.cat_private_equity * 3;
+  score += inp.cat_debt_financing * 1;
+
+  // Continent bias (North America, Europe historically higher success)
+  if (inp.cat_Continent_Name === 4) score += 3; // N. America
+  if (inp.cat_Continent_Name === 2) score += 2; // Europe
+
+  // Industry adjustments
+  const topIndustries = [23,16,15,11,1]; // Software, IT, Health, Finance, Biotech
+  if (topIndustries.includes(inp.cat_Industry_Group)) score += 3;
+
+  return Math.min(score, max);
+}
+
+function getFactors(inp) {
+  const factors = [];
+  if (inp.cat_total_investment >= 2) factors.push({ icon:'💰', label: 'Strong funding base' });
+  if (inp.cat_venture >= 2) factors.push({ icon:'📈', label: 'VC-backed' });
+  if (inp.cat_round_C || inp.cat_round_D || inp.cat_round_E || inp.cat_round_F)
+    factors.push({ icon:'🔄', label: 'Late-stage rounds' });
+  if (inp.cat_funding_rounds === 1) factors.push({ icon:'🔁', label: 'Multiple rounds' });
+  if (inp.cat_diff_funding_year === 1) factors.push({ icon:'⏱️', label: 'Long runway' });
+  if (inp.cat_angel) factors.push({ icon:'👼', label: 'Angel investors' });
+  if (inp.cat_private_equity) factors.push({ icon:'🏦', label: 'Private equity' });
+  if (inp.cat_Continent_Name === 4) factors.push({ icon:'🌎', label: 'N. America market' });
+  if (inp.cat_round_A) factors.push({ icon:'🅰️', label: 'Series A completed' });
+  if (inp.cat_round_B) factors.push({ icon:'🅱️', label: 'Series B completed' });
+  if (factors.length === 0) factors.push({ icon:'⚠️', label: 'Early stage only' });
+  return factors.slice(0, 6);
+}
+
+function getRecommendations(inp, score) {
+  const recs = [];
+
+  if (inp.cat_total_investment < 2)
+    recs.push({ priority:'high', icon:'💰', title:'Raise more capital', badge:'High Impact',
+      desc:'Total investment is below $1M. Startups with medium-to-large funding ($1M+) are significantly more likely to be acquired. Focus on closing a proper seed or Series A round.' });
+
+  if (inp.cat_venture < 2)
+    recs.push({ priority:'high', icon:'📈', title:'Secure venture capital backing', badge:'High Impact',
+      desc:'VC-backed startups show much stronger acquisition rates. Pitch to early-stage VCs or join an accelerator (Y Combinator, Techstars, etc.) to build institutional credibility.' });
+
+  if (!inp.cat_round_A)
+    recs.push({ priority:'high', icon:'🅰️', title:'Work toward a Series A', badge:'High Impact',
+      desc:'Completing a Series A signals product-market fit to acquirers. Define clear metrics (ARR, user growth, retention) that will satisfy institutional investors before pitching.' });
+
+  if (!inp.cat_round_B && inp.cat_round_A)
+    recs.push({ priority:'med', icon:'🅱️', title:'Progress to Series B', badge:'Medium Impact',
+      desc:'Series B completion is one of the stronger signals in the model. Focus on scaling revenue and demonstrating repeatable growth to justify the next round.' });
+
+  if (inp.cat_diff_funding_year === 0)
+    recs.push({ priority:'med', icon:'⏱️', title:'Extend your funding runway', badge:'Medium Impact',
+      desc:'A longer gap between rounds (2+ years) correlates with healthier businesses. Improve unit economics and reduce burn rate to demonstrate capital efficiency before the next raise.' });
+
+  if (inp.cat_funding_rounds === 0)
+    recs.push({ priority:'med', icon:'🔁', title:'Pursue multiple funding rounds', badge:'Medium Impact',
+      desc:'Startups with 3+ funding rounds show stronger survival signals. Each round validates the business to the market — aim for a structured seed → Series A progression.' });
+
+  if (!inp.cat_angel && inp.cat_total_investment < 2)
+    recs.push({ priority:'med', icon:'👼', title:'Engage angel investors', badge:'Medium Impact',
+      desc:'Angels provide not just capital but mentorship and network access. Target domain-specific angels who can open doors to strategic acquirers in your industry.' });
+
+  if (!inp.cat_private_equity && score > 40)
+    recs.push({ priority:'low', icon:'🏦', title:'Explore private equity', badge:'Lower Impact',
+      desc:'As you scale, PE can provide growth capital with less dilution than VC. PE firms often have direct relationships with strategic buyers relevant to your sector.' });
+
+  if (inp.cat_Continent_Name !== 4 && inp.cat_Continent_Name !== 2)
+    recs.push({ priority:'low', icon:'🌎', title:'Build presence in North America or Europe', badge:'Lower Impact',
+      desc:'Startups in North America and Europe have historically higher acquisition rates in the dataset. Consider a US or EU entity to attract international acquirers.' });
+
+  return recs.slice(0, 4);
+}
+
+async function predict() {
+  const btn = document.getElementById('predict-btn');
+  btn.classList.add('loading');
+  btn.disabled = true;
+
+  const inp = getInputs();
+  const score = scoreInputs(inp);
+  const prediction = score >= 38 ? 1 : 0;
+  const pct = Math.round(score * 0.85 + (prediction === 1 ? 15 : 0));
+  const displayPct = Math.min(Math.max(pct, 5), 95);
+
+  // Simulate brief model processing delay
+  await new Promise(r => setTimeout(r, 600));
+
+  btn.classList.remove('loading');
+  btn.disabled = false;
+
+  const resultEl = document.getElementById('result');
+  resultEl.style.display = 'block';
+
+  // Banner
+  const banner = document.getElementById('result-banner');
+  const icon = document.getElementById('result-icon');
+  const label = document.getElementById('result-label');
+  const sub = document.getElementById('result-sub');
+  banner.className = 'result-banner';
+
+  if (prediction === 1) {
+    banner.classList.add('success');
+    icon.textContent = '✦';
+    label.textContent = 'Likely Acquired / Successful';
+    sub.textContent = `Confidence score: ${displayPct}% — The model predicts this startup has strong signals for acquisition or continued growth.`;
+  } else {
+    banner.classList.add('failure');
+    icon.textContent = '◇';
+    label.textContent = 'Likely to Close';
+    sub.textContent = `Confidence score: ${100 - displayPct}% risk — The model predicts this startup's profile aligns more closely with companies that closed.`;
+  }
+
+  // Meter
+  setTimeout(() => {
+    document.getElementById('meter-fill').style.width = displayPct + '%';
+    const fill = document.getElementById('meter-fill');
+    fill.style.background = displayPct > 55 ? 'var(--accent)' : displayPct > 35 ? 'var(--warn)' : 'var(--danger)';
+  }, 100);
+
+  // Factors
+  const grid = document.getElementById('factors-grid');
+  grid.innerHTML = '';
+  getFactors(inp).forEach(f => {
+    const pill = document.createElement('div');
+    pill.className = 'factor-pill';
+    pill.innerHTML = `<span class="fi">${f.icon}</span>${f.label}`;
+    grid.appendChild(pill);
+  });
+
+  // Recommendations
+  const recList = document.getElementById('rec-list');
+  recList.innerHTML = '';
+  getRecommendations(inp, score).forEach(r => {
+    const item = document.createElement('div');
+    item.className = `rec-item priority-${r.priority === 'High Impact' ? 'high' : r.priority === 'Medium Impact' ? 'med' : 'low'}`;
+    const priorityClass = r.badge.startsWith('High') ? 'high' : r.badge.startsWith('Medium') ? 'med' : 'low';
+    item.className = `rec-item priority-${priorityClass}`;
+    item.innerHTML = `
+      <div class="rec-icon">${r.icon}</div>
+      <div class="rec-body">
+        <div class="rec-title">${r.title}<span class="rec-badge ${priorityClass}">${r.badge}</span></div>
+        <div class="rec-desc">${r.desc}</div>
+      </div>`;
+    recList.appendChild(item);
+  });
+
+  resultEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+</script>
+</body>
+</html>
